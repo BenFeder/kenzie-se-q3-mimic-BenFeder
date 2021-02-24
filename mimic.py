@@ -45,57 +45,44 @@ def create_mimic_dict(filename):
                 "who" : ["knows"]
             }
     """
-    with open(filename, "r") as file:
+    with open(filename, "r") as file:  # open the file in read mode
 
-        for line in file:
+        words_all = file.read()  # go through each line in the file
 
-            words = line.split()[:-1]
+        # create list of words in file
+        words_list = words_all.split()
 
-            mapped_dict = {}
+        # make words list up to, but not including, the last word,
+        # since the last word will have no following words
+        words = words_list[:-1]
 
-            mapped_dict[""] = list(words[0])
+        # create empty dictionary
+        mapped_dict = {}
 
-            for word in words:
+        # assign as key an empty string with the following word as the
+        # first word in the words list
+        mapped_dict[""] = [words[0]]
 
-                if word not in mapped_dict.keys():
+        for iteration, word in enumerate(words):  # loop through all words
 
-                    next_index = words.index(word) + 1
+            # if word isn't a key in the dictionary already...
+            if word not in mapped_dict.keys():
 
-                    mapped_dict[word] = list(words[next_index])
+                # create index spot for the following word
+                # after word in list
+                next_index = words.index(word) + 1
 
-                else:
+                # assign the following word as a value to the key of word
+                mapped_dict[word] = [words_list[next_index]]
 
-                    next_index = words.index(word) + 1
+            else:
 
-                    mapped_dict[word].extend(list(words[next_index]))
+                # add the following word as a value to the key of word,
+                # extending the initial list of words already assigned to
+                # that key of word
+                mapped_dict[word].extend([words_list[iteration + 1]])
 
-            return mapped_dict
-
-            #     words = line.split()
-
-            #     next_dict = {}
-
-            #     next_dict[""] = list(words[0])
-
-            #     for word in words:
-
-            #         if word != words[-1]:
-
-            #             next_words_indices = []
-            #             offset = -1
-            #             while True:
-            #                 try:
-            #                     offset = words.index(word, offset+1)
-            #                 except ValueError:
-            #                     continue
-            #                 next_words_indices.append(offset)
-
-            #             for next_word in next_words_indices:
-
-            #                 next_dict[word] = next_dict[word].append(
-            #                 list(words[next_word]))
-
-            # return next_dict
+        return mapped_dict  # return the created and filled dictionary
 
 
 def print_mimic_random(mimic_dict, num_words):
@@ -109,17 +96,18 @@ def print_mimic_random(mimic_dict, num_words):
     """
     output = ""  # set output to empty string
 
-    # add start word to output based on empty string "" as key from dictionary
-    output += mimic_dict[""]
-
     last_word = ""
 
     # repeat num_words times, getting next word after each subsequent word
     for word in range(num_words):
 
+        if last_word not in mimic_dict:
+
+            last_word = ""
+
         # select a random word from the next list, using last_word
         # as the dictionary key
-        output += random.choice(mimic_dict[last_word])
+        output += random.choice(mimic_dict[last_word]) + " "
 
         # create list of output words
         output_list = output.split()
@@ -128,8 +116,11 @@ def print_mimic_random(mimic_dict, num_words):
         # next word to add to output
         last_word = output_list[-1]
 
+    # get rid of white space on ends
+    output = output.strip()
+
     # print output
-    print(output)
+    print(output, end="")
 
 
 def main(args):
